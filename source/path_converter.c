@@ -40,20 +40,17 @@ static inline potrace_dpoint_t transform(potrace_dpoint_t point, const transform
 		double dx = point.x - trfm_ptr->rotation_point.x;
 		double dy = point.y - trfm_ptr->rotation_point.y;
 
-		res.x = dx * c - dy * s + trfm_ptr->rotation_point.x;
-		res.y = dx * s + dy * c + trfm_ptr->rotation_point.y;
-		
-		res.x = trfm_ptr->scale.x * res.x + trfm_ptr->translate.x;
-		res.y = trfm_ptr->scale.y * res.y + trfm_ptr->translate.y;
-		
-		return res;
+		point.x = dx * c - dy * s + trfm_ptr->rotation_point.x;
+		point.y = dx * s + dy * c + trfm_ptr->rotation_point.y;
+
 	}
 	res.x = trfm_ptr->scale.x * point.x + trfm_ptr->translate.x;
 	res.y = trfm_ptr->scale.y * point.y + trfm_ptr->translate.y;
+
 	return res;
 }
 
-static void curve_to(d_attr_t *d_ptr, potrace_dpoint_t point1, potrace_dpoint_t point2, potrace_dpoint_t point3)
+static void print_curve(d_attr_t *d_ptr, potrace_dpoint_t point1, potrace_dpoint_t point2, potrace_dpoint_t point3)
 {
 	potrace_dpoint_t new_point1 = transform(point1, d_ptr->transform);
 	potrace_dpoint_t new_point2 = transform(point2, d_ptr->transform);
@@ -86,7 +83,7 @@ static void curve_to(d_attr_t *d_ptr, potrace_dpoint_t point1, potrace_dpoint_t 
 	d_ptr->prev_command = 'c';
 }
 
-static void line_to(d_attr_t *d_ptr, potrace_dpoint_t point)
+static void print_line(d_attr_t *d_ptr, potrace_dpoint_t point)
 {
 	potrace_dpoint_t new_point = transform(point, d_ptr->transform);
 
@@ -100,7 +97,7 @@ static void line_to(d_attr_t *d_ptr, potrace_dpoint_t point)
 	d_ptr->prev_command = 'l';
 }
 
-static void move_to(d_attr_t *d_ptr, potrace_dpoint_t point)
+static void print_move(d_attr_t *d_ptr, potrace_dpoint_t point)
 {
 	potrace_dpoint_t new_point = transform(point, d_ptr->transform);
 
@@ -109,7 +106,7 @@ static void move_to(d_attr_t *d_ptr, potrace_dpoint_t point)
 	d_ptr->prev_command = 'M';
 }
 
-static void r_move_to(d_attr_t *d_ptr, potrace_dpoint_t point)
+static void print_rel_move(d_attr_t *d_ptr, potrace_dpoint_t point)
 {
 	potrace_dpoint_t new_point = transform(point, d_ptr->transform);
 
@@ -118,29 +115,29 @@ static void r_move_to(d_attr_t *d_ptr, potrace_dpoint_t point)
 	d_ptr->prev_command = 'm';
 }
 
-static int get_path(d_attr_t *d_ptr, potrace_curve_t *curve, int abs)
+static int print_path(d_attr_t *d_ptr, potrace_curve_t *curve, int rel)
 {
 	int i;
 	potrace_dpoint_t *c;
 	int m = curve->n;
 
 	c = curve->c[m - 1];
-	if (abs) {
-		move_to(d_ptr, c[2]);
+	if (rel) {
+		print_move(d_ptr, c[2]);
 	}
 	else {
-		r_move_to(d_ptr, c[2]);
+		print_rel_move(d_ptr, c[2]);
 	}
 
 	for (i = 0; i<m; i++) {
 		c = curve->c[i];
 		switch (curve->tag[i]) {
 		case POTRACE_CORNER:
-			line_to(d_ptr, c[1]);
-			line_to(d_ptr, c[2]);
+			print_line(d_ptr, c[1]);
+			print_line(d_ptr, c[2]);
 			break;
 		case POTRACE_CURVETO:
-			curve_to(d_ptr, c[0], c[1], c[2]);
+			print_curve(d_ptr, c[0], c[1], c[2]);
 			break;
 		}
 	}
@@ -154,9 +151,9 @@ static void write_paths(d_attr_t *d_ptr, potrace_path_t *plist)
 	potrace_path_t *p, *q;
 
 	for (p = plist; p; p = p->sibling) {
-		get_path(d_ptr, &p->curve, 1);
+		print_path(d_ptr, &p->curve, 1);
 		for (q = p->childlist; q; q = q->sibling) {
-			get_path(d_ptr, &q->curve, 0);
+			print_path(d_ptr, &q->curve, 0);
 		}
 		for (q = p->childlist; q; q = q->sibling) {
 			write_paths(d_ptr, q->childlist);
