@@ -59,7 +59,7 @@ PHP_METHOD(vectorizer, stackBitmap)
 		ZEND_PARSE_PARAMETERS_END();
 
 	id = getThis();
-	intern = Z_OPTIONS_P(id);
+	intern = Z_VECTORIZER_P(id);
 	intern->vectorizer->stack_bm = make_stack;
 }
 static inline void createBitmap(vectorizer_object_t *vectorizer, zval *imagick_id, const void *predicate_args, int(*predicate)(const PixelWand *pixel, const void *predicate_args))
