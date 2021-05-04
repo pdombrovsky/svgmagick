@@ -134,37 +134,39 @@ int black_white_predicate(const PixelWand *pixel, const void *args)
 }
 int color_predicate(const PixelWand *pixel, const void *args)
 {
-	double a, r, g, b;
+	double da, dr, dg, db;
 	double eps = 2e-3;
 	color_t *args_ptr = (color_t *)args;
 
-	r = PixelGetRed(pixel);
-	g = PixelGetGreen(pixel);
-	b = PixelGetBlue(pixel);
-	a = PixelGetAlpha(pixel);
+	dr = fabs(PixelGetRed(pixel) - args_ptr->red);
+	dg = fabs(PixelGetGreen(pixel) - args_ptr->green);
+	db = fabs(PixelGetBlue(pixel) - args_ptr->blue);
+	da = fabs(PixelGetAlpha(pixel) - args_ptr->alpha);
 	
 	return (
-		(fabs(a - args_ptr->alpha) < eps) &&
-		(fabs(r - args_ptr->red) < eps) &&
-		(fabs(g - args_ptr->green) < eps) &&
-		(fabs(b - args_ptr->blue) < eps)
+		(da < eps) &&
+		(dr < eps) &&
+		(dg < eps) &&
+		(db < eps)
 		);	
 }
 int stack_color_predicate(const PixelWand *pixel, const void *args)
 {
-	double a, r, g, b;
+	double  da, dr, dg, db;
 	double eps = 2e-3;
 	color_t *args_ptr = (color_t *)args;
 
-	r = PixelGetRed(pixel);
-	g = PixelGetGreen(pixel);
-	b = PixelGetBlue(pixel);
-	a = PixelGetAlpha(pixel);
+	dr = args_ptr->red - PixelGetRed(pixel);
+	dg = args_ptr->green - PixelGetGreen(pixel);
+	db = args_ptr->blue - PixelGetBlue(pixel);
+	da = args_ptr->alpha - PixelGetAlpha(pixel);
 
-	return ((a + eps > args_ptr->alpha) &&
-		(r + eps >args_ptr->red) &&
-		(g + eps > args_ptr->green) &&
-		(b + eps > args_ptr->blue));
+	return (
+		(da > eps) &&
+		(dr > eps) &&
+		(dg > eps) &&
+		(db > eps)
+		);
 }
 int fill_bitmap(
 	potrace_bitmap_t *bitmap,
