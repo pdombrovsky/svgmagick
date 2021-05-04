@@ -162,10 +162,10 @@ int stack_color_predicate(const PixelWand *pixel, const void *args)
 	da = args_ptr->alpha - PixelGetAlpha(pixel);
 
 	return (
-		(da > eps) &&
-		(dr > eps) &&
-		(dg > eps) &&
-		(db > eps)
+		(da < eps) &&
+		(dr < eps) &&
+		(dg < eps) &&
+		(db < eps)
 		);
 }
 int fill_bitmap(
