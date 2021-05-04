@@ -83,7 +83,7 @@ static inline void createBitmap(vectorizer_object_t *vectorizer, zval *imagick_i
 	if (vectorizer->bitmap != NULL) {
 		free_internal_bitmap(vectorizer);
 	}
-	/* Create bitmap here, if result is NULL than something goes wrong, and we should throw exception */
+	/* Create bitmap here, if result is not equal zero than something goes wrong, and we should throw exception */
 	err = create_bitmap(&vectorizer->bitmap, imagick_intern->magick_wand);
 	if (err == 1) {
 		zend_throw_exception(php_vectorizer_exception_class_entry, "Invalid image sizes", 0);
