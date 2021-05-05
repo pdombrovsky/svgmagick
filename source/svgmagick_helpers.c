@@ -38,7 +38,7 @@ data_t *get_data_defaults(void) {
 	p->fci_cache = empty_fcall_info_cache;
 	return p;
 }
-vectorizer_object_t *get_vectorizer_defalts()
+vectorizer_object_t *get_vectorizer_defaults()
 {
 	vectorizer_object_t *obj;
 
@@ -59,7 +59,7 @@ vectorizer_object_t *get_vectorizer_defalts()
 	obj->transform.scale.x = 1.0;
 	return obj;
 }
-progress_object_t *get_progress_defalts()
+progress_object_t *get_progress_defaults()
 {
 	progress_object_t *obj;
 
@@ -198,7 +198,6 @@ int fill_bitmap(
 	}
 	// Clean up
 	iterator=DestroyPixelIterator(iterator);
-
 	return 0;
 }
  
