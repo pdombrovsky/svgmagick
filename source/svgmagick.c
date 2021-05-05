@@ -273,7 +273,7 @@ static zend_object *php_progress_object_new(zend_class_entry *class_type)
 		zend_object_properties_size(class_type));
 	zend_object_std_init(&intern->zo, class_type);
 	object_properties_init(&intern->zo, class_type);
-	intern->progress = get_progress_defalts();
+	intern->progress = get_progress_defaults();
 	if (!intern->progress) {
 		zend_error(E_ERROR, "Failed to create Progress object");
 	}
@@ -290,7 +290,7 @@ static zend_object *php_vectorizer_object_new(zend_class_entry *class_type)
 		zend_object_properties_size(class_type));
 	zend_object_std_init(&intern->zo, class_type);
 	object_properties_init(&intern->zo, class_type);
-	intern->vectorizer=get_vectorizer_defalts();
+	intern->vectorizer=get_vectorizer_defaults();
 	if (!intern->vectorizer) {
 		zend_error(E_ERROR, "Failed to create Vectorizer object");
 	}
