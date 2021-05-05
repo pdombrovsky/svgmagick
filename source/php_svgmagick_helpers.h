@@ -39,9 +39,9 @@ struct _color_s {
 };
 typedef struct _color_s color_t;
 
-progress_object_t *get_progress_defalts(void);
+progress_object_t *get_progress_defaults(void);
 
-vectorizer_object_t *get_vectorizer_defalts(void);
+vectorizer_object_t *get_vectorizer_defaults(void);
 
 data_t *get_data_defaults(void);
 
