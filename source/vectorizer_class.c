@@ -104,33 +104,32 @@ PHP_METHOD(vectorizer, createSimpleBitmap)
 	zval *id;
 	zval *imagick_id = NULL;
 	php_vectorizer_object *intern;
-	b_w_args_t args = { 0.5 , 1.0 };
-	
+	double threshold = 0.5;
+	zend_bool ignoreAlpha = 1;
 	ZEND_PARSE_PARAMETERS_START(1, 3)
 		Z_PARAM_OBJECT_OF_CLASS(imagick_id, php_imagick_get_class_entry())
 		Z_PARAM_OPTIONAL
-		Z_PARAM_DOUBLE(args.threshold)
-		Z_PARAM_DOUBLE(args.opacity)
+		Z_PARAM_DOUBLE(threshold)
+		Z_PARAM_BOOL(ignoreAlpha)
 		ZEND_PARSE_PARAMETERS_END();
 	
 	int count = ZEND_NUM_ARGS();
 	if (count >= 2) {
-		if (args.threshold < 0.0 || args.threshold > 1.0) {
+		if (threshold < 0.0 || threshold > 1.0) {
 			zend_throw_exception(php_vectorizer_exception_class_entry, "The threshold value must be between 0.0 and 1.0", 0);
 			return;
 		}
 
 	}  
-	if (count == 3) {
-		if (args.opacity < 0.0 || args.opacity > 1.0) {
-			zend_throw_exception(php_vectorizer_exception_class_entry, "The opacity value must be between 0.0 and 1.0", 0);
-			return;
-		}
-	}
-	
 	id = getThis();
 	intern = Z_VECTORIZER_P(id);
-	createBitmap(intern->vectorizer, imagick_id, &args, &black_white_predicate);
+	if (ignoreAlpha) {
+		createBitmap(intern->vectorizer, imagick_id, &threshold, &black_white_predicate_rgb);
+	}
+	else {
+		createBitmap(intern->vectorizer, imagick_id, &threshold, &black_white_predicate_rgba);
+	}
+	
 }
 PHP_METHOD(vectorizer, createColorBitmap)
 {

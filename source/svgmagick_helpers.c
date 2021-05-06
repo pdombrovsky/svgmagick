@@ -119,18 +119,26 @@ int create_bitmap(potrace_bitmap_t **ptr_bitmap, MagickWand *magick_wand)
 	*ptr_bitmap = bitmap;
 	return 0;
 }
-int black_white_predicate(const PixelWand *pixel, const void *args)
+int black_white_predicate_rgb(const PixelWand *pixel, const void *args)
 {
-	double a, r, g, b;
-	b_w_args_t *args_ptr = (b_w_args_t *)args;
-	a = PixelGetAlpha(pixel);
-	if ((a + 1e-4) > args_ptr->opacity) {
-		r = PixelGetRed(pixel);
-		g = PixelGetGreen(pixel);
-		b = PixelGetBlue(pixel);
-		return ((r + g + b) / 3 < args_ptr->threshold) ? 1 : 0;
-	}
-	return 0;
+	double threshold = *((double *)args);
+	double sum = 0.0;
+	sum += PixelGetRed(pixel);
+	sum += PixelGetGreen(pixel);
+	sum += PixelGetBlue(pixel);
+	sum /= 3;
+	return (sum < threshold) ? 1 : 0;
+}
+int black_white_predicate_rgba(const PixelWand *pixel, const void *args)
+{
+	double threshold = *((double *)args);
+	double sum = 1.0;
+	sum -= PixelGetAlpha(pixel);
+	sum += PixelGetRed(pixel);
+	sum += PixelGetGreen(pixel);
+	sum += PixelGetBlue(pixel);
+	sum /= 4;
+	return (sum < threshold) ? 1 : 0;
 }
 int color_predicate(const PixelWand *pixel, const void *args)
 {
@@ -142,13 +150,13 @@ int color_predicate(const PixelWand *pixel, const void *args)
 	dg = fabs(PixelGetGreen(pixel) - args_ptr->green);
 	db = fabs(PixelGetBlue(pixel) - args_ptr->blue);
 	da = fabs(PixelGetAlpha(pixel) - args_ptr->alpha);
-	
+
 	return (
 		(da < eps) &&
 		(dr < eps) &&
 		(dg < eps) &&
 		(db < eps)
-		);	
+		);
 }
 int stack_color_predicate(const PixelWand *pixel, const void *args)
 {
@@ -177,7 +185,7 @@ int fill_bitmap(
 {
 	PixelIterator *iterator = NULL;
 	PixelWand **pixels = NULL;
-	int x,y;
+	int x, y;
 	double r, g, b;
 	int value;
 
@@ -197,7 +205,8 @@ int fill_bitmap(
 		}
 	}
 	// Clean up
-	iterator=DestroyPixelIterator(iterator);
+	iterator = DestroyPixelIterator(iterator);
+	
 	return 0;
 }
- 
+

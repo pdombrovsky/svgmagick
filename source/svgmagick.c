@@ -107,7 +107,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(vectorizer_createSimpleBitmap_args, 0, 0, 3)
 ZEND_ARG_OBJ_INFO(0, imagick, Imagick, 0)
 ZEND_ARG_INFO(0, threshold)
-ZEND_ARG_INFO(0, opacity)
+ZEND_ARG_INFO(0, ignoreAlpha)
 ZEND_END_ARG_INFO()
 
 /* Since imagick contains a bug(???) (a function php_imagickpixel_get_class_entry(),
@@ -386,7 +386,7 @@ PHP_MINFO_FUNCTION(svgmagick)
 	php_info_print_table_header(2, "Class", "Progress");
 	php_info_print_table_header(2, "Method", "Info");
 	php_info_print_table_row(2, "__construct(Options obj)", "Binds Progress instance with Options instance");
-	php_info_print_table_row(2, "setLimits(double minimum, double maximm, optional double epsilon)", "Default values are 0.0, 1.0 and 0.0");
+	php_info_print_table_row(2, "setLimits(double minimum, double maximm, double epsilon = 0.0)", "Default values are 0.0, 1.0 and 0.0");
 	php_info_print_table_row(2, "setCallback(callback function)", "Default value is NULL");
 	php_info_print_table_row(2, "start()", "Start call callback function");
 	php_info_print_table_row(2, "end()", "Last call callback function");
@@ -394,10 +394,10 @@ PHP_MINFO_FUNCTION(svgmagick)
 	php_info_print_table_header(2, "Class", "Vectorizer");
 	php_info_print_table_header(2, "Method", "Info");
 	php_info_print_table_row(2, "__construct(Options obj)", "Binds Vectorizer instance with Options instance");
-	php_info_print_table_row(2, "createSimpleBitmap(Imagick obj, optional double treshold, optional double opacity)", "Creates a bitmap of an image by treating colors as shades of gray. Default treshold is 0.5, default opacity is 1.0");
-	php_info_print_table_row(2, "createColorBitmap(Imagick obj, double red, double green, double blue, optional double alpha)", "Creates a bitmap of an image by given color components");
+	php_info_print_table_row(2, "createSimpleBitmap(Imagick obj, double treshold = 0.5, bool ignoreAlpha = true)", "Creates a bitmap of an image by treating colors as shades of gray. Default treshold is 0.5, ignoreAlpha is true");
+	php_info_print_table_row(2, "createColorBitmap(Imagick obj, double red, double green, double blue, double alpha = 1.0)", "Creates a bitmap of an image by given color components");
 	php_info_print_table_row(2, "stackBitmap(bool makeStack)", "Default value is 0 (false)");
-	php_info_print_table_row(2, "setScale(double scaleX, optional double scaleY)", "Sets scale factor. if scaleY is not passed, its value is considered equal to scaleX. Defaults are 1.0");
+	php_info_print_table_row(2, "setScale(double scaleX, double scaleY)", "Sets scale factor. if scaleY is not passed, its value is considered equal to scaleX. Defaults are 1.0");
 	php_info_print_table_row(2, "setTranslate(double dX, double dX)", "Sets the translation vector. Defaults are 0.0");
 	php_info_print_table_row(2, "setRotate(double x, double y, double angle)", "Sets rotation point and angle. Defaults are 0.0");
 	php_info_print_table_row(2, "trace()", "Trace current bitmap. if successful return true, otherwise - false");
