@@ -73,10 +73,9 @@ try {
     if (!$res) {
         throw new \Exception("Unable to read source file");
     }
-    /* The instance of 'Options' class contains default settings now, you can change them using accessor methods.
-       See phpinfo() (or php -i) for details.
-    */
     $options = new Options();
+    /* The instance of 'Options' class contains default settings now, you can change them using accessor methods.
+       See phpinfo() (or php -i) for details. */
     //$options->setAlphaMax(0.9);
     $vectorizer = new Vectorizer($options);
     /* Pixels with a gray level below the threshold are considered black, the rest are white.
