@@ -119,7 +119,6 @@ PHP_METHOD(vectorizer, createSimpleBitmap)
 			zend_throw_exception(php_vectorizer_exception_class_entry, "The threshold value must be between 0.0 and 1.0", 0);
 			return;
 		}
-
 	}  
 	id = getThis();
 	intern = Z_VECTORIZER_P(id);

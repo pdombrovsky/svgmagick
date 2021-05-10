@@ -55,30 +55,16 @@ static void print_curve(d_attr_t *d_ptr, potrace_dpoint_t point1, potrace_dpoint
 	potrace_dpoint_t new_point1 = transform(point1, d_ptr->transform);
 	potrace_dpoint_t new_point2 = transform(point2, d_ptr->transform);
 	potrace_dpoint_t new_point3 = transform(point3, d_ptr->transform);
-
-	if (d_ptr->prev_command != 'c') {
-		smart_str_append_printf(d_ptr->content,
-			"c%f %f %f %f %f %f ",
-			new_point1.x - d_ptr->prev_point.x,
-			new_point1.y - d_ptr->prev_point.y,
-			new_point2.x - d_ptr->prev_point.x,
-			new_point2.y - d_ptr->prev_point.y,
-			new_point3.x - d_ptr->prev_point.x,
-			new_point3.y - d_ptr->prev_point.y
-		);
-	}
-	else {
-		smart_str_append_printf(d_ptr->content,
-			"%f %f %f %f %f %f ",
-			new_point1.x - d_ptr->prev_point.x,
-			new_point1.y - d_ptr->prev_point.y,
-			new_point2.x - d_ptr->prev_point.x,
-			new_point2.y - d_ptr->prev_point.y,
-			new_point3.x - d_ptr->prev_point.x,
-			new_point3.y - d_ptr->prev_point.y
-		);
-	}
-	
+	const char *format = (d_ptr->prev_command != 'c') ? "c%f %f %f %f %f %f " : "%f %f %f %f %f %f ";
+	smart_str_append_printf(d_ptr->content,
+		format,
+		new_point1.x - d_ptr->prev_point.x,
+		new_point1.y - d_ptr->prev_point.y,
+		new_point2.x - d_ptr->prev_point.x,
+		new_point2.y - d_ptr->prev_point.y,
+		new_point3.x - d_ptr->prev_point.x,
+		new_point3.y - d_ptr->prev_point.y
+	);
 	d_ptr->prev_point = new_point3;
 	d_ptr->prev_command = 'c';
 }
@@ -86,49 +72,33 @@ static void print_curve(d_attr_t *d_ptr, potrace_dpoint_t point1, potrace_dpoint
 static void print_line(d_attr_t *d_ptr, potrace_dpoint_t point)
 {
 	potrace_dpoint_t new_point = transform(point, d_ptr->transform);
-
-	if (d_ptr->prev_command != 'l') {
-		smart_str_append_printf(d_ptr->content, "l%f %f ", new_point.x - d_ptr->prev_point.x, new_point.y - d_ptr->prev_point.y);
-	}
-	else {
-		smart_str_append_printf(d_ptr->content, "%f %f ", new_point.x - d_ptr->prev_point.x, new_point.y - d_ptr->prev_point.y);
-	}
+	const char *format = (d_ptr->prev_command != 'l') ? "l%f %f " : "%f %f ";
+	smart_str_append_printf(d_ptr->content, format, new_point.x - d_ptr->prev_point.x, new_point.y - d_ptr->prev_point.y);
 	d_ptr->prev_point = new_point;
 	d_ptr->prev_command = 'l';
 }
-
-static void print_move(d_attr_t *d_ptr, potrace_dpoint_t point)
+static void print_move(d_attr_t *d_ptr, potrace_dpoint_t point, int absolute)
 {
 	potrace_dpoint_t new_point = transform(point, d_ptr->transform);
-
+	if (absolute) {
+		smart_str_append_printf(d_ptr->content, "M%f %f ", new_point.x, new_point.y);
+		d_ptr->prev_command = 'M';
+	}
+	else {
+		smart_str_append_printf(d_ptr->content, "m%f %f ", new_point.x - d_ptr->prev_point.x, new_point.y - d_ptr->prev_point.y);
+		d_ptr->prev_command = 'm';
+	}
 	d_ptr->prev_point = new_point;
-	smart_str_append_printf(d_ptr->content, "M%f %f ", new_point.x, new_point.y);
-	d_ptr->prev_command = 'M';
 }
 
-static void print_rel_move(d_attr_t *d_ptr, potrace_dpoint_t point)
-{
-	potrace_dpoint_t new_point = transform(point, d_ptr->transform);
-
-	smart_str_append_printf(d_ptr->content, "m%f %f ", new_point.x - d_ptr->prev_point.x, new_point.y - d_ptr->prev_point.y);
-	d_ptr->prev_point = new_point;
-	d_ptr->prev_command = 'm';
-}
-
-static int print_path(d_attr_t *d_ptr, potrace_curve_t *curve, int rel)
+static int print_path(d_attr_t *d_ptr, potrace_curve_t *curve, int absolute)
 {
 	int i;
 	potrace_dpoint_t *c;
 	int m = curve->n;
 
 	c = curve->c[m - 1];
-	if (rel) {
-		print_move(d_ptr, c[2]);
-	}
-	else {
-		print_rel_move(d_ptr, c[2]);
-	}
-
+	print_move(d_ptr, c[2], absolute);
 	for (i = 0; i<m; i++) {
 		c = curve->c[i];
 		switch (curve->tag[i]) {
