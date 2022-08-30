@@ -1,2 +1,2 @@
 # svgmagick
- php extension for vectorizing images
+ php c-extension for vectorizing images
